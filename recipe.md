@@ -46,7 +46,7 @@ age_checker("2017-01-22") "access denied you are 9 years old you must be 16 year
 age_checker("1967-10-22") "access granted"
 age_checker("") "error"
 age_checker("1967-january-01")"error"
-age_checker("22-04-2020)"error incorrect format"
+age_checker("22-04-2020")error incorrect format
 age_checker(19670222)"error"
 ```
 ## 4. Implement the Behaviour
@@ -58,15 +58,54 @@ Here's an example for you to start with:
 ```python
 # EXAMPLE
 
-from lib.extract_uppercase import *
+from lib.age_checker import *
+from dateutil.relativedelta import *
+from datetime import date
+"""
+    Given the date of birth that equates to age of 16 years old or above
+    Returns message "access granted"
+"""
+
+def test_age_checker_old_enough():
+    result = age_checker("1967-10-22")
+    assert result == "access granted"
 
 """
-Given a lower and an uppercase word
-It returns a list with the uppercase word
+    Given the date of birth that equates to the age below 16 years old
+    Returns message "access denied you are {true_age} years old you must be 16 years of age or older to access this site"
 """
-def test_extract_uppercase_with_upper_then_lower():
-    result = extract_uppercase("hello WORLD")
-    assert result == ["WORLD"]
+
+def test_age_checker_not_old_enough():
+    age_string = "2017-01-22"
+    today = date.today()
+    age = relativedelta(today, age_string).years()
+    
+    result = age_checker(age_string)
+
+    assert result == f"access denied you are {age} years old you must be 16 years of age or older to access this site"
+
+"""
+    Given incorrect type or format of date
+    Raises an exception
+"""
+
+def test_age_checker_wrong_type_format():
+    #Invalid format YYYY MMM DD
+    with pytest.raises(Exception) as e:
+        age_checker("1967-january-01")
+    result = str(e.value)
+    assert result == "error"
+    #Invalid format DD-MM-YYYY
+    with pytest.raises(Exception) as e:
+        age_checker("22-04-2020")
+    result = str(e.value)
+    assert result == "error"
+    #Invalid type (int)
+    with pytest.raises(TypeError) as e:
+        age_checker(19670222)
+    result = str(e.value)
+    assert result == "error"
+
 ```
 
 Ensure all test function names are unique, otherwise pytest will ignore them!
